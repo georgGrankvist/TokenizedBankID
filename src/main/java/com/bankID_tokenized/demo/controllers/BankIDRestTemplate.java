@@ -1,0 +1,116 @@
+package com.bankID_tokenized.demo.controllers;
+
+import com.bankID_tokenized.demo.wrappers.AuthRequest;
+import com.bankID_tokenized.demo.wrappers.AuthResponse;
+import com.bankID_tokenized.demo.wrappers.CollectRequest;
+import com.bankID_tokenized.demo.wrappers.CollectResponse;
+import com.bankID_tokenized.demo.web3.WhiteListHandler;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.util.Objects;
+
+@Service
+public class BankIDRestTemplate {
+
+    @Autowired
+    private final RestTemplate restTemplate;
+    private final String baseURL;
+    private final HttpHeaders httpHeaders;
+    private final WhiteListHandler whiteListHandler;
+
+
+    public BankIDRestTemplate(RestTemplate restTemplate,WhiteListHandler whiteListHandler) {
+        this.restTemplate = restTemplate;
+        this.whiteListHandler = whiteListHandler;
+
+        baseURL = "https://appapi2.test.bankid.com/rp/v5";
+        httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+    }
+
+
+    public ResponseEntity<AuthResponse> authenticate(AuthRequest authRequest) {
+        HttpEntity<AuthRequest> authenticationReq = new HttpEntity<>(authRequest, httpHeaders);
+
+        try {
+            return restTemplate.postForEntity(baseURL + "/auth", authenticationReq, AuthResponse.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<CollectResponse> collect(CollectRequest orderRef) {
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<CollectRequest> request = new HttpEntity<>(orderRef, httpHeaders);
+
+        try {
+
+            CollectResponse collectResponse = restTemplate.postForEntity(baseURL + "/collect", request, CollectResponse.class).getBody();
+
+
+            assert collectResponse != null;
+            if (collectResponse.getStatus().equals("complete")) {
+
+                String sha256 = DigestUtils.sha256Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
+                whiteListHandler.outputHash(sha256);
+            }
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (HttpClientErrorException hcee) {
+            String errorBody = hcee.getResponseBodyAsString();
+            if (errorBody.contains("No such order"))
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+@Configuration
+static
+class RestTemplateClass extends RestTemplate {
+
+    @Lazy
+    @Bean
+    public RestTemplate restTemplate () throws KeyStoreException, IOException, UnrecoverableKeyException, NoSuchAlgorithmException, CertificateException, KeyManagementException {
+        KeyStore clientStore = KeyStore.getInstance("PKCS12");
+        clientStore.load(new FileInputStream("src/main/resources/config/tls/FPTestcert3_20200618.p12"), "qwerty123".toCharArray());
+
+        SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+        sslContextBuilder.useProtocol("TLS");
+        sslContextBuilder.loadKeyMaterial(clientStore, "qwerty123".toCharArray());
+        sslContextBuilder.loadTrustMaterial(new TrustSelfSignedStrategy());
+
+        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContextBuilder.build());
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setSSLSocketFactory(sslConnectionSocketFactory)
+                .build();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+        return new RestTemplate(requestFactory);
+    }
+}
+
+}
