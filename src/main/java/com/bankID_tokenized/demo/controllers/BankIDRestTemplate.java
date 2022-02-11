@@ -1,9 +1,6 @@
 package com.bankID_tokenized.demo.controllers;
 
-import com.bankID_tokenized.demo.wrappers.AuthRequest;
-import com.bankID_tokenized.demo.wrappers.AuthResponse;
-import com.bankID_tokenized.demo.wrappers.CollectRequest;
-import com.bankID_tokenized.demo.wrappers.CollectResponse;
+import com.bankID_tokenized.demo.wrappers.*;
 import com.bankID_tokenized.demo.web3.WhiteListHandler;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -46,8 +43,10 @@ public class BankIDRestTemplate {
     }
 
 
-    public ResponseEntity<AuthResponse> authenticate(AuthRequest authRequest) {
-        HttpEntity<AuthRequest> authenticationReq = new HttpEntity<>(authRequest, httpHeaders);
+    public ResponseEntity<AuthResponse> authenticate(BankIDRequest authRequest) {
+        System.out.println(authRequest.getEndUserIp() + authRequest.getPersonalNumber());
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<BankIDRequest> authenticationReq = new HttpEntity<>(authRequest, httpHeaders);
 
         try {
             return restTemplate.postForEntity(baseURL + "/auth", authenticationReq, AuthResponse.class);
