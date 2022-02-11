@@ -33,6 +33,7 @@ public class BankIDController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CollectResponse> bankIDResultCollect (@RequestBody CollectRequest collectRequest) {
+        System.err.println(collectRequest.getOrderRef());
         return bankIDRestTemplate.collect(collectRequest);
     }
 }

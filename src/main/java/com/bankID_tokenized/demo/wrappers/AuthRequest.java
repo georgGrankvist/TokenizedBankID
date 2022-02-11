@@ -10,7 +10,6 @@ import java.net.InetAddress;
 @Setter
 @Data
 public class AuthRequest {
-
         private String personalNumber;
 
 }
