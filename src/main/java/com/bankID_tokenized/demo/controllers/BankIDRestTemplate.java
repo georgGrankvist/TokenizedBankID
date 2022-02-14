@@ -68,11 +68,12 @@ public class BankIDRestTemplate {
             assert collectResponse != null;
             if (collectResponse.getStatus().equals("complete")) {
 
-                String sha256 = DigestUtils.sha256Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
-                whiteListHandler.outputHash(sha256);
+                String hashedPersonalNumber = DigestUtils.sha256Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
+                whiteListHandler.outputHash(hashedPersonalNumber);
             }
 
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(collectResponse,HttpStatus.OK);
+
         } catch (HttpClientErrorException hcee) {
             String errorBody = hcee.getResponseBodyAsString();
             if (errorBody.contains("No such order"))
