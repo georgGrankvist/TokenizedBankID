@@ -30,12 +30,14 @@ public class BankIDRestTemplate {
     private final RestTemplate restTemplate;
     private final String baseURL;
     private final HttpHeaders httpHeaders;
+
+    @Autowired
     private final WhiteListHandler whiteListHandler;
 
 
-    public BankIDRestTemplate(RestTemplate restTemplate,WhiteListHandler whiteListHandler) {
+    public BankIDRestTemplate(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        this.whiteListHandler = whiteListHandler;
+        this.whiteListHandler = new WhiteListHandler();
 
         baseURL = "https://appapi2.test.bankid.com/rp/v5";
         httpHeaders = new HttpHeaders();
@@ -68,7 +70,7 @@ public class BankIDRestTemplate {
             assert collectResponse != null;
             if (collectResponse.getStatus().equals("complete")) {
 
-                String hashedPersonalNumber = DigestUtils.sha256Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
+                String hashedPersonalNumber = DigestUtils.sha512Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
                 whiteListHandler.outputHash(hashedPersonalNumber);
             }
 

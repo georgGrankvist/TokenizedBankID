@@ -22,7 +22,6 @@ public class BankIDController {
 
     public ResponseEntity <AuthResponse> bankIDAuth (@RequestBody AuthRequest authRequest) {
         BankIDRequest bankIDRequest = new BankIDRequest("80.217.149.82", authRequest.getPersonalNumber());
-        System.out.println("Attempting authentication");
         return bankIDRestTemplate.authenticate(bankIDRequest);
     }
 
