@@ -30,7 +30,7 @@ public class WhiteListHandler {
 
     public WhiteListHandler () {
         web3j = Web3j.build(new HttpService("https://goerli.infura.io/v3/ee8a83a7efef41bb88178cf740c69511"));
-        walletCredentials = Credentials.create("b9ab14464545ccfb3f06ae29dc3fd399c8e48c05b6f6b7a31785cb046a899f54");
+        walletCredentials = Credentials.create("");
     }
 
     public void web3Connect (String hashedID) {
