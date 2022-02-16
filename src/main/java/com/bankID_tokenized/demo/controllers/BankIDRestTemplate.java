@@ -58,26 +58,30 @@ public class BankIDRestTemplate {
         }
     }
 
-    public ResponseEntity<CollectResponse> collect(CollectRequest orderRef) {
+    public ResponseEntity<CollectResponse> collect(CollectRequest orderRef, String address) {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<CollectRequest> request = new HttpEntity<>(orderRef, httpHeaders);
 
         try {
 
             CollectResponse collectResponse = restTemplate.postForEntity(baseURL + "/collect", request, CollectResponse.class).getBody();
+            System.err.println(orderRef);
+
 
 
             assert collectResponse != null;
             if (collectResponse.getStatus().equals("complete")) {
 
                 String hashedPersonalNumber = DigestUtils.sha512Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
-                whiteListHandler.outputHash(hashedPersonalNumber);
+                whiteListHandler.outputHash(address);
             }
 
             return new ResponseEntity<>(collectResponse,HttpStatus.OK);
 
         } catch (HttpClientErrorException hcee) {
             String errorBody = hcee.getResponseBodyAsString();
+            System.err.println("FAIL");
+            System.out.println();
             if (errorBody.contains("No such order"))
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             else {

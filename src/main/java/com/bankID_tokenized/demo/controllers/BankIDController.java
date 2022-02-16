@@ -29,8 +29,8 @@ public class BankIDController {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CollectResponse> bankIDResultCollect (@RequestBody CollectRequest collectRequest) {
+    public ResponseEntity<CollectResponse> bankIDResultCollect (@RequestParam ("address") String address, @RequestBody CollectRequest collectRequest) {
         System.err.println(collectRequest.getOrderRef());
-        return bankIDRestTemplate.collect(collectRequest);
+        return bankIDRestTemplate.collect(collectRequest, address);
     }
 }
