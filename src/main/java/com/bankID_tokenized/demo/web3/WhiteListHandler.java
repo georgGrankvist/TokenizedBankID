@@ -25,7 +25,7 @@ public class WhiteListHandler {
 
     public void outputHash (String hashedID) {
         System.out.println(hashedID);
-        web3Connect(hashedID);
+        web3Connect();
     }
 
     public WhiteListHandler () {
@@ -33,7 +33,7 @@ public class WhiteListHandler {
         walletCredentials = Credentials.create("");
     }
 
-    public void web3Connect (String hashedID) {
+    public void web3Connect () {
         System.out.println("Owner address = " + walletCredentials.getAddress());
         try {
             Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().send();
