@@ -30,7 +30,8 @@ public class BankIDController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CollectResponse> bankIDResultCollect (@RequestParam ("address") String address, @RequestBody CollectRequest collectRequest) {
-        System.err.println(collectRequest.getOrderRef());
+        System.err.println(collectRequest.getOrderRef() + "Första callet");
+        System.err.println(address + "första addressen");
         return bankIDRestTemplate.collect(collectRequest, address);
     }
 }

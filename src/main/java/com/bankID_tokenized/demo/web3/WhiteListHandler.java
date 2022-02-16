@@ -26,7 +26,7 @@ public class WhiteListHandler {
     private final Credentials walletCredentials;
 
     public void outputHash (String address) {
-
+        System.err.println("whitelisthandler");
         web3Connect(address);
     }
 
@@ -51,7 +51,7 @@ public class WhiteListHandler {
                     web3j, walletCredentials, 80001);
 
             TokenizedBankID whiteListContract = TokenizedBankID.load("0x19a916be5C39E0acdd66b83e08CA392977acaB46",web3j,txManager,new DefaultGasProvider());
-            TransactionReceipt transactionReceipt = whiteListContract.mintNFT("0xb1502403E97b7B072F4139ab874c101cE743a8A6", "hej").send();
+            TransactionReceipt transactionReceipt = whiteListContract.addUser( address ).send();
             System.out.println(transactionReceipt.getTransactionHash());
             System.out.println("Address: " + address + "is Whitelisted");
 

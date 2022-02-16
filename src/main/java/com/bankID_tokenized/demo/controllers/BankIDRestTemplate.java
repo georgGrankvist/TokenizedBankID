@@ -71,6 +71,7 @@ public class BankIDRestTemplate {
             if (collectResponse.getStatus().equals("complete")) {
 
                 String hashedPersonalNumber = DigestUtils.sha512Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
+                System.err.println(address);
                 whiteListHandler.outputHash(address);
             }
 
