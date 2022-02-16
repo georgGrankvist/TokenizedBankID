@@ -65,8 +65,6 @@ public class BankIDRestTemplate {
         try {
 
             CollectResponse collectResponse = restTemplate.postForEntity(baseURL + "/collect", request, CollectResponse.class).getBody();
-            System.err.println(orderRef);
-
 
 
             assert collectResponse != null;

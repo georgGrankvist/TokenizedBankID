@@ -11,6 +11,8 @@ import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.EthGasPrice;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.springframework.stereotype.Component;
+import org.web3j.tx.RawTransactionManager;
+import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
 import wrapper.TokenizedBankID;
 
@@ -29,8 +31,8 @@ public class WhiteListHandler {
     }
 
     public WhiteListHandler () {
-        web3j = Web3j.build(new HttpService("https://goerli.infura.io/v3/ee8a83a7efef41bb88178cf740c69511"));
-        walletCredentials = Credentials.create("b9ab14464545ccfb3f06ae29dc3fd399c8e48c05b6f6b7a31785cb046a899f54");
+        web3j = Web3j.build(new HttpService("https://polygon-mumbai.infura.io/v3/ee8a83a7efef41bb88178cf740c69511"));
+        walletCredentials = Credentials.create("d898765ecdb507340694a7ccf04905b51c950648aff310552453f939ab3a8142");
     }
 
     public void web3Connect (String address) {
@@ -45,8 +47,11 @@ public class WhiteListHandler {
             System.out.println("Gas price: " + gasPrice.getGasPrice());
             System.out.println("Address to be Whitelisted: " + address);
 
-            TokenizedBankID whiteListContract = TokenizedBankID.load("0x2bd0df4817cde2c037fa480f6561bfe03494fe26",web3j,walletCredentials,new DefaultGasProvider());
-            TransactionReceipt transactionReceipt = whiteListContract.addUser(address).send();
+            TransactionManager txManager = new RawTransactionManager(
+                    web3j, walletCredentials, 80001);
+
+            TokenizedBankID whiteListContract = TokenizedBankID.load("0x19a916be5C39E0acdd66b83e08CA392977acaB46",web3j,txManager,new DefaultGasProvider());
+            TransactionReceipt transactionReceipt = whiteListContract.mintNFT("0xb1502403E97b7B072F4139ab874c101cE743a8A6", "hej").send();
             System.out.println(transactionReceipt.getTransactionHash());
             System.out.println("Address: " + address + "is Whitelisted");
 
