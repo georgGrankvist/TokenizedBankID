@@ -5,16 +5,18 @@ import lombok.Getter;
 import lombok.Setter;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.protocol.core.methods.response.EthBlockNumber;
-import org.web3j.protocol.core.methods.response.EthGasPrice;
-import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.springframework.stereotype.Component;
+import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.tx.gas.StaticGasProvider;
 import wrapper.TokenizedBankID;
+
+import java.math.BigInteger;
+import java.util.concurrent.CompletableFuture;
 
 @Getter
 @Setter
@@ -47,13 +49,16 @@ public class WhiteListHandler {
             System.out.println("Gas price: " + gasPrice.getGasPrice());
             System.out.println("Address to be Whitelisted: " + address);
 
-            TransactionManager txManager = new RawTransactionManager(
-                    web3j, walletCredentials, 80001);
+            TransactionManager transactionManager = new FastRawTransactionManager(web3j,walletCredentials, 80001);
 
-            TokenizedBankID whiteListContract = TokenizedBankID.load("0x19a916be5C39E0acdd66b83e08CA392977acaB46",web3j,txManager,new DefaultGasProvider());
+
+            TokenizedBankID whiteListContract = TokenizedBankID.load("0xb493914c7b574efdf53dee89a824b7347c0d8c09",web3j, transactionManager,new DefaultGasProvider());
             TransactionReceipt transactionReceipt = whiteListContract.addUser( address ).send();
-            System.out.println(transactionReceipt.getTransactionHash());
-            System.out.println("Address: " + address + "is Whitelisted");
+
+                System.out.println(transactionReceipt.getTransactionHash());
+                System.out.println("Address: " + address + " is Whitelisted");
+                System.out.println(transactionReceipt.getStatus());
+                System.out.println(transactionReceipt.getGasUsed());
 
 
         } catch (Exception e) {
