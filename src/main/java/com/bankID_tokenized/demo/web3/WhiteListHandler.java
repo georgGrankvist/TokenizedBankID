@@ -34,7 +34,7 @@ public class WhiteListHandler {
 
     public WhiteListHandler () {
         web3j = Web3j.build(new HttpService("https://polygon-mumbai.infura.io/v3/ee8a83a7efef41bb88178cf740c69511"));
-        walletCredentials = Credentials.create("d898765ecdb507340694a7ccf04905b51c950648aff310552453f939ab3a8142");
+        walletCredentials = Credentials.create("");
     }
 
     public void web3Connect (String address) {

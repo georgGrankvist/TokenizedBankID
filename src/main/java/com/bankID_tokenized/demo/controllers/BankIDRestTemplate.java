@@ -66,16 +66,14 @@ public class BankIDRestTemplate {
 
             CollectResponse collectResponse = restTemplate.postForEntity(baseURL + "/collect", request, CollectResponse.class).getBody();
 
-
             assert collectResponse != null;
             if (collectResponse.getStatus().equals("complete")) {
-
                 String hashedPersonalNumber = DigestUtils.sha512Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
-                System.err.println(address);
                 whiteListHandler.outputHash(address);
-            }
 
+            }
             return new ResponseEntity<>(collectResponse,HttpStatus.OK);
+
 
         } catch (HttpClientErrorException hcee) {
             String errorBody = hcee.getResponseBodyAsString();
