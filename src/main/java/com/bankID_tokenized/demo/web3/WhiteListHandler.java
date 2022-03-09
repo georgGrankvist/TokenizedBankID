@@ -56,7 +56,7 @@ public class WhiteListHandler {
 
             TransactionReceiptProcessor transactionReceiptProcessor = new PollingTransactionReceiptProcessor(web3j,3000,40);
             TransactionManager transactionManager = new FastRawTransactionManager(web3j,walletCredentials,transactionReceiptProcessor);
-            TokenizedBankID whiteListContract = TokenizedBankID.load("0xd655da810B2a1304eBB6707f9396C5c2138819c4",web3j, transactionManager,new DefaultGasProvider());
+            TokenizedBankID whiteListContract = TokenizedBankID.load("0x83e1091E30F776E9e10c0DFFE0fAFA980247fda9",web3j, transactionManager,new DefaultGasProvider());
             CompletableFuture<TransactionReceipt> transactionReceipt = whiteListContract.addUser(address).sendAsync();
 
             transactionReceiptProcessor.waitForTransactionReceipt(transactionReceipt.get().getTransactionHash());
