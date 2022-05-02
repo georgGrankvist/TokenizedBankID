@@ -69,7 +69,7 @@ public class BankIDRestTemplate {
             assert collectResponse != null;
             if (collectResponse.getStatus().equals("complete")) {
                 String hashedPersonalNumber = DigestUtils.sha512Hex(collectResponse.getCompletionData().getUser().getPersonalNumber());
-                whiteListHandler.outputHash(address);
+                whiteListHandler.outputHash(address,hashedPersonalNumber);
 
             }
             return new ResponseEntity<>(collectResponse,HttpStatus.OK);

@@ -1,5 +1,4 @@
 package com.bankID_tokenized.demo.web3;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,17 +8,11 @@ import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import org.springframework.stereotype.Component;
 import org.web3j.tx.FastRawTransactionManager;
-import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
-import org.web3j.tx.gas.StaticGasProvider;
-import org.web3j.tx.response.Callback;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
-import org.web3j.tx.response.QueuingTransactionReceiptProcessor;
 import org.web3j.tx.response.TransactionReceiptProcessor;
 import wrapper.TokenizedBankID;
-
-import java.math.BigInteger;
 import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,9 +25,9 @@ public class WhiteListHandler {
     private final Web3j web3j;
     private final Credentials walletCredentials;
 
-    public void outputHash (String address) {
+    public void outputHash (String address,String hashedGovID) {
         System.err.println("whitelisthandler");
-        web3Connect(address);
+        web3Connect(address,hashedGovID);
     }
 
     public WhiteListHandler () {
@@ -42,7 +35,7 @@ public class WhiteListHandler {
         walletCredentials = Credentials.create("fe559c7814450d6f6c9a635c0d88afa70244598342be87a249f0c9fa3bfc83c7");
     }
 
-    public void web3Connect (String address) {
+    public void web3Connect (String address, String hashedGovID ) {
         System.out.println("Owner address =  " + walletCredentials.getAddress());
         try {
             Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().send();
@@ -56,8 +49,8 @@ public class WhiteListHandler {
 
             TransactionReceiptProcessor transactionReceiptProcessor = new PollingTransactionReceiptProcessor(web3j,3000,40);
             TransactionManager transactionManager = new FastRawTransactionManager(web3j,walletCredentials,transactionReceiptProcessor);
-            TokenizedBankID whiteListContract = TokenizedBankID.load("0x83e1091E30F776E9e10c0DFFE0fAFA980247fda9",web3j, transactionManager,new DefaultGasProvider());
-            CompletableFuture<TransactionReceipt> transactionReceipt = whiteListContract.addUser(address).sendAsync();
+            TokenizedBankID whiteListContract = TokenizedBankID.load("0xfCf57F45CaE40d4fd5964B0cbDaf3dc8CFEE2525",web3j, transactionManager,new DefaultGasProvider());
+            CompletableFuture<TransactionReceipt> transactionReceipt = whiteListContract.addUser(address, hashedGovID).sendAsync();
 
             transactionReceiptProcessor.waitForTransactionReceipt(transactionReceipt.get().getTransactionHash());
 
